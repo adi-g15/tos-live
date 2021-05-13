@@ -41,7 +41,6 @@ sdparm
 sg3_utils
 smartmontools
 tcpdump
-testdisk
 usb_modeswitch
 wireless-regdb
 wireless_tools
@@ -56,12 +55,10 @@ ttf-fira-mono
 ttf-linux-libertine
 noto-fonts
 make
-firefox-developer-edition
 jsoncpp
 pavucontrol
 rofi-tos
 r8152-dkms
-visual-studio-code-insiders-bin
 libmpdclient
 python-dbus
 siji-git
@@ -80,7 +77,6 @@ jfsutils
 lvm2
 man-db
 man-pages
-nano
 usbutils
 xfsprogs
 dhcpcd
@@ -96,4 +92,3 @@ memtest86+
 mkinitcpio
 mkinitcpio-archiso
 amd-ucode
-intel-ucode
