@@ -44,27 +44,21 @@ function build() {
 
   mkarchiso -v . || exit 1
 
-  if [[ ! -d "images/server" ]]; then
-    mkdir -p images/server
-  fi
-
-  if [[ ! -d "images/awesome" ]]; then
-    mkdir -p images/awesome
-  fi
-
   if [[ "$1" == "-awesome" ]]; then
+    mkdir -p images/awesome || exit 1
     cp out/toslinux*.iso images/awesome/"$iso_normal""$append".iso
     mv out/toslinux*.iso out/toslive-awesome.iso
   fi
 
   if [[ "$1" == "-s" ]]; then
+    mkdir -p images/server || exit 1
     cp out/toslinux*.iso images/server/"$iso_normal""$append".iso
     mv out/toslinux*.iso out/tosserver.iso
   fi
 
 }
 
-if [[ "$1" == "-h" ]]; then
+if [[ "$1" == "-h" || "$1" == "" ]]; then
   echo "-h | help message"
   echo "-s | compile iso in server mode"
   echo "-awesome | compile iso in awesome mode "
