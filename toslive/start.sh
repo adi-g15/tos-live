@@ -32,11 +32,11 @@ append=""
 function build() {
   # Install needed dependencies
   if [[ "$(which mkarchiso)" != "/usr/bin/mkarchiso" ]]; then
-    yay -Syu archiso || exit 1
+    pacman -Syu archiso || exit 1
   fi
   
-  if ! yay -Q | grep -q mkinitcpio-archiso; then
-    yay -Syu mkinitcpio-archiso || exit 1
+  if ! pacman -Q | grep -q mkinitcpio-archiso; then
+    pacman -Syu mkinitcpio-archiso || exit 1
   fi
 
   # do a complete remove of the working directory since we are building multiple different version using it
@@ -85,7 +85,7 @@ echo "$append"
 if [[ "$1" == "-awesome" ]]; then
   sed -i -r 's;version=".*";version="'"$version"'";' airootfs/root/customize_airootfs.sh
   cp packages.x86_64_awesome packages.x86_64
-#   build "$1" "$2"
+  build "$1" "$2"
   echo "$1" "$2"
 fi
 
