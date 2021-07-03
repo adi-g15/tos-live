@@ -59,6 +59,23 @@ fi
 if [[ "$GPG_REPO_KEY" == "" ]]; then
     echo "No repo key found! Please set the GPG_REPO_KEY env variable to the correct key"
 fi
+
+if [[ "$(pgrep gpg-agent | wc -l)" -lt 1 ]]; then
+	gpg-agent &
+
+fi
+
+if [[ "$GPG_PASS" != "" && "GPG_EMAIL" != "" ]]; then
+	# Cache our gpg password so that makepkg and repo-key don't make use of pinmode
+#topbar-right="icon_button"
+    	set +x
+	touch fake_signing
+	gpg --yes --pinentry-mode loopback --detach-sign --passphrase "$GPG_PASS" --default-key "$GPG_EMAIL" -o "fake_signing.gpg" "fake_signing"
+	rm "fake_signing.gpg" "fake_signing"
+    	set -x
+
+fi
+
 set -x
 
 if [[ ! -d arch ]]; then
@@ -126,17 +143,26 @@ function installpackage() {
 	if [[ -d "$2" ]]; then
 		rm -rf "$2"
 	fi
+	
 	git clone "$1" "$2"
-    loc=$(pwd)
+    	
+	loc=$(pwd)
+	
 	cd "$2" || exit 1 
+
+	# In case the PKGBUILD is not in the root
+	if [[ ! -f "PKGBUILD" ]]; then
+		find . -type f -name 'PKGBUILD' -exec cp {} . \;
+	fi
+	
 	if [[ "$4" == "no-exit" ]]; then
 		makepkg -s --sign --key "$GPG_REPO_KEY" --noconfirm
 	else
 		makepkg -s --sign -f --key "$GPG_REPO_KEY" --noconfirm || exit 1
 	fi
-	rm "$loc"/arch/$3*.pkg.tar.*
+	
+	find "$loc"/arch/ -type f -iname "$3"'*.pkg.tar.*' -exec rm {} \;
     ls $3*.pkg.tar.*
-    sleep 1
 	cp $3*.pkg.tar.* "$loc"/arch
 	cd "$loc" || exit 1
 }
@@ -251,10 +277,11 @@ function secureISO {
 	fi
 	sha256sum "$1" > "$1".sha256
 	sed -i 's/arch\///g' "$1".sha256
+	
 	# accept all user input for overriding files
-    set +x
+    	set +x
 	gpg --yes --pinentry-mode loopback --detach-sign --passphrase "$GPG_PASS" --default-key "$GPG_EMAIL" -o "$1".gpg "$1"
-    set -x
+    	set -x
 }
 
 function rebuildRepoDB {
